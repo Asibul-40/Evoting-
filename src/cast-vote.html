@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Election Results</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+      <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+<style>
+  #input-candidateName-field{
+    margin-left: 3.75em;
+  }
+  input{
+    margin: 1em;
+  }
+  .txt2{
+  font-style: italic;
+  text-align: center;
+  color: red;
+  font-family: verdana;
+  font-size: 50px;
+  padding-bottom: 1em;
+  padding-top: 1.5em;
+}
+
+.TimerClass h2
+{
+  text-align: center;
+  font-size: 6em;
+  line-height: 0.7em;
+  color: #333;
+}
+
+.TimerClass h2 span
+{
+  display: block;
+  font-weight: 300;
+  letter-spacing: 7px;
+  font-size: 0.2em;
+}
+
+.Countdown
+{
+  display: flex;
+  margin-left: 490px;
+  margin-top: 20px;   
+}
+
+.Countdown div
+{
+  width: 100px;
+  height: 100px;
+  line-height: 100px;
+  text-align: center;
+  background: #333;
+  margin:0 15px;
+  color: #fff;
+  font-size: 3em;
+  font-weight: 300;
+}
+
+.Countdown div:after
+{
+  content: '';
+  display: flex;
+    left: 0;
+    width: 100%;
+    height: 34px;
+    background: blue;
+    color: white;
+    font-size: 0.50em;
+    line-height: 35px;
+    font-weight: 500;
+    align-content: center;
+}
+
+.Countdown #day:after
+{
+  content: 'Days';
+}
+
+.Countdown #hour:after
+{
+  content: 'Hours'
+}
+
+.Countdown #minute:after
+{
+  content: 'Minutes'
+}
+
+.Countdown #second:after
+{
+  content: 'Seconds'
+}
+</style>
+
+  </head>
+
+  <header class="text-gray-600 body-font">
+    <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
+      <a id="tag" class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0" href="index.html">
+        <img src="images/voteicon.png" alt="-_-" height="46" width="46">
+   
+        <span class="ml-3 text-xl" style="font-size: 1.5em;">Vote Center</span>
+      </a>
+      <nav id="index-headr" class="md:ml-auto flex flex-wrap items-center text-base justify-center">
+        <a id="tag" href="index.html" class="mr-5 hover:text-gray-900" style="font-size: 1.6em;">Home</a>
+        <a href="about.html" id="tag" class="mr-5 hover:text-gray-900"
+        style="font-size: 1.6em;">About</a>
+        <a id="tag" href="contact-us.html" class="mr-5 hover:text-gray-900" style="font-size: 1.6em;">Contact</a>
+        <a id="tag" href="cast-vote.html" class="mr-5 hover:text-gray-900" style="font-size: 1.6em; border-bottom: 2px solid blue; position: relative; font-weight: bold; color: blue; ">Cast vote</a>
+
+      </nav>
+    </div>
+  </header>
+
+  <body class="bdy">
+    <div class="container" >
+      <div class="row">
+        <div class="col-lg-12">
+
+          <div class="TimerClass">
+            <h2><span>Election Countdown Clock</span>2021</h2>
+            <div class="Countdown" id="countDown">
+              <div id="day">NA</div>
+              <div id="hour">NA</div>
+              <div id="minute">NA</div>
+              <div id="second">NA</div>
+           </div>
+         </div>
+
+         <script type="text/javascript">
+         </script>          
+
+            <h1 class="txt">Details of the candidates...</h1>
+
+          <div id="loader">
+            <p class="text-center">Loading...</p>
+          </div>
+          <div id="content" style="display: none;">
+
+             <div id="candidate-content" style="text-align: center;">
+               <form action="" onsubmit="App.addCandidate(); return false;">
+                <div id="candidate-name-party-section">
+                 <label for="name">Name:</label>
+                 <input id="input-candidateName-field" type="text" name="name" placeholder="Candidate's name" style="border: 1px solid black"><br>
+
+                 <label for="party-name">Party Name:</label>
+                 <input id="input-candidateParty-field" type="text" name="party-name" placeholder="Candidate's Party name" style="border: 1px solid black"><br>
+
+                  <button id="addCandidate" type="submit" class="btn btn-primary">Add Candidate</button>
+                  <button id="setTimerButton" type="button" class="btn btn-primary" >Set timer</button>
+                  <p>NB : Once you don't have any candidate to add, then set the <i><b>Countdown Timer</b></i> to start the election.</p>
+                  </div>
+                </form>
+
+
+                  <!-- <form class="clock" onsubmit="App.castVote(); return false;"> -->
+                 <form action="" onsubmit="App.addTimer(); return false;">
+                   <div id="timer-form">
+                    <p>Set a duration time for the election:</p>
+                     <input type="text" id="input-day" size="4" placeholder="Day" style="border: 1px solid black;">
+
+                     <input type="text" id="input-hour" size="4" placeholder="Hour" style="border: 1px solid black;">
+
+                     <input type="text" id="input-min" size="4" placeholder="Minute" style="border: 1px solid black;"><br>
+                     <button class="btn btn-primary"> <a href="cast-vote.html">Add more</a> </button>
+                     <button id="startButton" type="submit" class="btn btn-primary">Start Election</button>
+                   </div>
+                 </form>   
+
+               </div>
+
+            <table class="table" id="tableInfo">
+              <thead>
+                
+                  <th> #</th>
+                  <th> Name</th>
+                  <th> Party Name</th>
+                  <th> Votes</th>
+                
+              </thead>
+              <tbody id="candidatesResults">    </tbody>
+            </table>
+
+            <form id="vote-form" onsubmit="App.castVote(); return false;">
+               <div class="form-group" style="margin-top: 7em;">
+                 <h1 style="font-size: 1.5em; text-align: center;  font-family: poppins; font-weight: bold; color: blue; margin-bottom: .7em;">Select Candidate to Vote</h1>
+
+                    <div id="selection" style="text-align: center;">
+                    </div>
+                    <div class="bttn" style="text-align: center;">
+                      <button type="submit" class="btn btn-primary" style="padding-left: 13em; padding-right: 15em; margin-top: 1.5em;">VOTE</button>
+                    </div>
+               </div>
+            </form>
+
+            <p id="accountAddress" class="text-center" style="margin-top: 9em"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/web3.min.js"></script>
+    <script src="js/truffle-contract.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
