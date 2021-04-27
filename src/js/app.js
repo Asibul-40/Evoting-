@@ -256,7 +256,7 @@ App = {
       console.error("ERR => "+err);
     });
   },
-
+//Comment added
   addCandidate: function(){
     
     var name = $("#input-candidateName-field").val();
