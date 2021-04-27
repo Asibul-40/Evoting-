@@ -1,24 +1,20 @@
-
 App = {
   web3Provider: null,
   contracts: {},
   account: '0x0',
+  admin: '0x5726794276f6b13466ca62ca49c0f6428545656d',
 
   init: function() {
     return App.initWeb3();
   },
 
-//  By initializing web3 we can conncet our 
-//  client side application to our local blockchain.....
-  initWeb3: async function() {
-    await ethereum.enable();
+  initWeb3: function() {
+     ethereum.enable();
     if (typeof web3 !== 'undefined') {
       // If a web3 instance is already provided by Meta Mask.
       App.web3Provider = web3.currentProvider;
       web3 = new Web3(web3.currentProvider);
-    }
-    else
-    {
+    } else {
       // Specify default instance if no web3 instance provided
       App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
       web3 = new Web3(App.web3Provider);
@@ -26,148 +22,176 @@ App = {
     return App.initContract();
   },
 
-
-
   initContract: function() {
     $.getJSON("Election.json", function(election) {
-
       // Instantiate a new truffle contract from the artifact
       App.contracts.Election = TruffleContract(election);
-
       // Connect provider to interact with contract
       App.contracts.Election.setProvider(App.web3Provider);
+      App.listenForVoteEvents();
+      //App.listenForAddCandidateEvents();
+
       return App.render();
     });
   },
 
-
   render: function() {
     var electionInstance;
+    var timerD;
     var loader = $("#loader");
     var content = $("#content");
-    var candidateContent = $("#candidate-content");
-    var table = $("#tableInfo");
-    var voteForm = $("#vote-form");
-    var inputTimerField = $("#timer-form");
-    var setTimerbutton = $("#setTimerButton");
-    var candidateNamePartySection = $("#candidate-name-party-section");
-    var startButton = $("#startButton");
-    var timer = $('#countDown');
-    var addCandidate = $('#addCandidate');
-    var candidatesDetails = $('#candidatesResults');
+    var addform = $("#addCandidateForm");
+    var timerform = $("#changeTimer");
+    var setTimerbutton= $("#setTimerButton");
+    var moreadd= $("#moreadd");
+    var timer=$("#timer");
+    var message=$("#winnermessage");
+    var newelection=$("#startnewelection");
+    var startbutton=$("#startbutton");
+    var flag=0;
+    var details=$("#details");
+    var mytimer;
+    var totalcandidates;
+    var candidatesResults;
+    var candidatesSelect;
+    var notify=0;
+    var thewinner;
+    var maxv;
+    var gotwinner=0;
+
+
+    //-----------------------------------------------------
+
+    var _month;
+    var _day;
+    var _hour;
+    var _minute;
+
+    //--------------------------------
 
 
     loader.show();
     content.hide();
+    //------
+    addform.hide();
+    timerform.hide();
+    timer.show();
+    message.hide();
+    newelection.hide();
+    details.hide();
 
     // Load account data
     web3.eth.getCoinbase(function(err, account) {
       if (err === null) {
         App.account = account;
+        if(App.admin===account)
+        {
+            $("#accountAddress").html("Admin's Account: "+account); 
+            $("#addCandidate").html("Add a Candidate?"); 
 
-      // console.log("==>"+account);
-        $("#accountAddress").html("Your Account: <b>" + account +"</b>");
+        }
+        else{
+        $("#accountAddress").html("User's account: "+account);
+        addform.hide();
+        timerform.hide();
+        newelection.hide();
+      }
       }
     });
-    var totalCandidate;
-    var adminAccount = "0x1fe5e175a0181ce0177b79c19acb59eeeaad5b41";    
 
     // Load contract data
-    App.contracts.Election.deployed().then(instance=> {
+    App.contracts.Election.deployed().then(function(instance) {
       electionInstance = instance;
-      // console.log("Admin -> "+ adminAccount);
-      return electionInstance.countCandidate();
+      return electionInstance.candidatesCount();
     }).then(function(candidatesCount) {
-      totalCandidate = candidatesCount;
-
-      var candidatesResults = $("#candidatesResults");
+      candidatesResults = $("#candidatesResults");
       candidatesResults.empty();
 
-      var candidateSelect = $('#selection');
-      candidateSelect.empty();
+      candidatesSelect = $('#candidatesSelect');
+      candidatesSelect.empty();
+      if(candidatesCount>0)
+      {
+        totalcandidates=candidatesCount;
 
       for (var i = 1; i <= candidatesCount; i++) {
         electionInstance.candidates(i).then(function(candidate) {
-          var id = candidate[0];
-          var name = candidate[1];
-          var voteCount = candidate[2];
-          var partyName = candidate[3];
 
           // Render candidate Result
-          var candidateTemplate = "<tr><td> " + id + "</td><td> " + name + " </td><td>" + partyName + "</td><td>" + voteCount + "</td></tr>";
+          var candidateTemplate = "<tr><th>" + candidate[0] + "</th><td>" + candidate[1] + "</td><td>" + candidate[2] +"</td><td>" + candidate[3] + "</td></tr>"
           candidatesResults.append(candidateTemplate);
 
-          var candidateOption = "<input type='radio' name='candidate' value=' "+ id +" ' id=' "+id+" '> <lebel for=' "+id+" ' style=' padding-right:4em;'>" + name + "</lebel>"
-          candidateSelect.append(candidateOption);
-        
-          // console.log("->>>>"+candidateOption);
+          // Render candidate ballot option
+          var candidateOption = "<option value='" + candidate[0]+ "' >" + candidate[1] + "</ option>"
+          candidatesSelect.append(candidateOption);
+          //------------------
         });
+        loader.hide();
+        content.show();
+        details.show();
+
+      }
+      }
+      else{
+        document.getElementById('loader').innerHTML = 'Opps!No election is currently running!';
       }
       return electionInstance.voters(App.account);
-    }).then(markedAcc=>{
-      if(markedAcc){
-        voteForm.hide();
+    }).then(function(hasVoted) {
+      // Do not allow a user to vote
+      if(hasVoted) {
+        $('form').hide();
       }
-      loader.hide();
-      content.show();
+      /*loader.hide();
+      content.show();*/
+      //------------
+      if(App.account===App.admin)
+      {
+          addform.show();
+          
+          setTimerbutton.click(function(){
+          addform.hide();
+          timerform.show();
+          flag=0;
+        });
+          moreadd.click(function(){
+           addform.show();
+           timerform.hide();
+          });
 
-      if(adminAccount==App.account){
-      ///Admin can set the candidates as well as the timer.....
-        candidateNamePartySection.show();
-        inputTimerField.hide();
-        voteForm.hide();
-
-        startButton.click(function(){
-            var day = $("#input-day").val();
-            var hour = $("#input-hour").val();
-            var min = $("#input-min").val();
-            // alert(`Voting process will continue for ${day} days ${hour} hours ${min} minutes`)
-            console.log(day+"-"+hour+"-"+min);
-            candidateContent.hide();
-        })
-      addCandidate.click(function(){
-          table.show();
-          candidatesDetails.show();
-        })
-      setTimerbutton.click(function(){
-          console.log("ABIR")
-          candidateNamePartySection.hide();
-          inputTimerField.show();
-          table.hide();
-        })
       }
-      else {
-        candidateContent.hide();
-        table.show();
-        // inputTimerField.hide();
-      }
+      //-----------
     }).catch(function(error) {
       console.warn(error);
     });
-    // -----------------------------------------------------
-                var count=0;
-                var tieName = [];
-                var allVote = [];
-      App.contracts.Election.deployed().then(i=>{
-      electionInstance = i;
-      return electionInstance.countCandidate();
-    }).then(totalCandi=>{
-      
-      // console.log("--++-"+count);
-      electionInstance.TimingList(1).then(dates => {
-      var months = dates[0];
-      var days = dates[1];
-      var hours = dates[2];
-      var mins = dates[3];
-      var scnd = dates[4];
-      console.log(months+"__"+days+"__"+hours+"__"+mins+"__"+scnd);
-
-      var countdate=new Date(2021 , months , days , hours , mins , scnd).getTime();
-      console.log(countdate);
-
-      var time = setInterval(function(){
-      var now=new Date().getTime();
-               // console.log("----"+now);
+//------------------------------------------------------------------------------------
+    App.contracts.Election.deployed().then(function(instance) {
+      electionInstance = instance;
+      return electionInstance.month();
+    }).then(function(month) {
+      _month=month;
+    });
+    App.contracts.Election.deployed().then(function(instance) {
+      electionInstance = instance;
+      return electionInstance.day();
+    }).then(function(day) {
+      _day=day;
+    });
+    App.contracts.Election.deployed().then(function(instance) {
+      electionInstance = instance;
+      return electionInstance.hour();
+    }).then(function(hour) {
+      _hour=hour;
+    });
+    App.contracts.Election.deployed().then(function(instance) {
+      electionInstance = instance;
+      return electionInstance.minute();
+    }).then(function(minute) {
+      _minute=minute;
+      var countdate=new Date(_month+' '+_day+',2021 '+_hour+':'+_minute+':'+'00').getTime();
+             if(_month!=="0"&&day!==0&&hour!==0&&minute!==0)
+             {
+             function newyear()
+             {
+               var now=new Date().getTime();
                gap=countdate-now;
                var second=1000;
                var minute=second*60;
@@ -179,147 +203,134 @@ App = {
                var m=Math.floor((gap%(hour))/(minute));
                var s=Math.floor((gap%(minute))/(second));
 
-               if(d<10) d="0"+d;
-               if(h<10) h="0"+h;
-               if(m<10) m="0"+m;
-               if(s<10) s="0"+s;
                document.getElementById('day').innerText=d;
                document.getElementById('hour').innerText=h;
                document.getElementById('minute').innerText=m;
                document.getElementById('second').innerText=s;
-
-
-               if(gap<=0){
-                clearInterval(time);
-                voteForm.hide();
-                // alert(totalCandidate);
-                var can = totalCandi;
-                var nam,voteCnt;
-                // console.log(can);
-                for(var i=1 ; i<=totalCandi ; i++)
-                {
-                  // var j = i;
-                  _i(i);
-                  electionInstance.candidates(i).then(cand=>{
-                    var voteCnt = cand[2];
-                    var nam = cand[1];
-                    voteCnt = voteCnt.toNumber();
-                    console.log(i,nam,voteCnt);
-
-                    function _i(i) {
-                      // body...
-                    
-                    if(i==1) {
-                     count=voteCnt;
-                     console.log("asi"+count+"~~~");
-                    }
-                    else{
-                      if(voteCnt>count)
-                      {
-                        var winner = nam;
-                        tieName.push( nam );
-                        count = voteCnt;
-                        console.log("nai->---"+count+"~~~"+voteCnt);
+               if(d<=0&&h<=0&&m<=0&&s<=0)
+               {
+                  clearInterval(mytimer);
+                  if(flag===0)
+                  {
+                  timer.hide();
+                  message.show();
+                  content.hide();
+                  if(App.account===App.admin){
+                        newelection.show();
                       }
-                      else if(voteCnt==count && count!=0){
-                        console.log("ho"+count+"~~~~"+voteCnt);
-                        tieName.push(nam);
-                      }
+                  addform.hide();
+                  details.hide();
+                  App.contracts.Election.deployed().then(function(instance){
+                      return instance.winningProposal({from:App.account});
+                    }).then(function(result){
+                    }).catch(function(err){
+                       console.error(err);
+                    });
+                    App.contracts.Election.deployed().then(function(instance){
+                      return instance.winnername();
+                    }).then(function(winnername){
+                      document.getElementById('winner').innerHTML=winnername;
+                    }).catch(function(err){
+                       console.error(err);
+                    });
                   }
-                  }
-                });
 
-
-                }
-                // var uniqueNames = Array.from(new Set(allVote));
-                console.log(tieName);
-                console.log(allVote);
-
-                 if(tieName.length>1)  document.getElementById("countDown").innerHTML = `Oppps ! There is no winner for this election. As the following ${tieName.length} candidates got the same vote.`;
-                // alert("Time's Up!");
+                  startbutton.click(function(){
+                    flag=1;
+                     App.contracts.Election.deployed().then(function(instance){
+                      return instance.resettime({from: App.account});
+                     }).then(function(result){
+                       newelection.hide();
+                       message.hide();
+                       addform.show();
+                     }).catch(function(err){
+                        console.error(err);
+                     });
+                   });
                }
+
+             }
+
+            mytimer= setInterval(function(){
+              newyear();
              },1000)
-      })
-    })
+          }
+    });
+
+
+  //---------------------------------------------------------------------------------
+
   },
 
-  castVote: function(){
-    var candidateId = $('input[name = candidate]:checked').val();
-    
-    App.contracts.Election.deployed().then(i => {
-      var electionInstance = i;
-      return electionInstance.vote(candidateId , { from:App.account });
-    }).then(result=> {
-      $('#content').hide();
-      $('#loader').show();
-    }).catch(err=>{
-      console.error("ERR => "+err);
+  castVote: function() {
+    var candidateId = $('#candidatesSelect').val();
+    App.contracts.Election.deployed().then(function(instance) {
+      return instance.vote(candidateId, { from: App.account });
+    }).then(function(result) {
+      // Wait for votes to update
+      $("#content").hide();
+      $("#loader").show();
+    }).catch(function(err) {
+      console.error(err);
     });
   },
-//Comment added
-  addCandidate: function(){
-    
-    var name = $("#input-candidateName-field").val();
-    var prtyName = $("#input-candidateParty-field").val();
-    // console.log(name + "--->" + prtyName);
-    
-    App.contracts.Election.deployed().then(i => {
-      var electionInstance = i;
-      return electionInstance.addCandidates(name, prtyName , { from:App.account });
-    }).then(result=> {
-      $('#candidateContent').show();
-      $('#table').show();
-    }).catch(err=>{
-      console.error("ERR => "+err);
+  //--------------------------------------------------------------
+  addMoreCandidate: function(){
+    var name=$('#newname').val();
+    var partyname=$('#newpartyname').val();
+    App.contracts.Election.deployed().then(function(instance){
+      return instance.addCandidate(name,partyname,{from: App.account});
+    }).then(function(result){
+      // $("#content").hide();
+      //$("#loader").show();
+      App.render();
+    }).catch(function(err){
+      console.error(err);
     });
   },
+  //---------------------------------------------------
+  changeTimer: function(){
+    var newday=$('#input-day').val();
+    var newmonth=$('#input-month').val();
+    var newhour=$('#input-hour').val();
+    var newminute=$('#input-minute').val();
+    App.contracts.Election.deployed().then(function(instance){
+      return instance.changeTime(newmonth,newday,newhour,newminute,{from: App.account});
+    }).then(function(result){
+       //$("#content").hide();
+       //$("#loader").show();
+       App.render();
+    }).catch(function(err){
+      console.error(err);
+    });
+    
+  },
+  listenForVoteEvents: function() {
+  App.contracts.Election.deployed().then(function(instance) {
+    instance.votedevent({},{
+      fromBlock: 0,
+      toBlock: 'latest'
+    }).watch(function(error, event) {
+      console.log("event triggered", event)
+      // Reload when a new vote is recorded
+      App.render();
+    });
+  });
+  }
+  /*listenForAddCandidateEvents: function() {
+  App.contracts.Election.deployed().then(function(instance) {
+    instance.addCandidateEvent({},{
+      fromBlock: 0,
+      toBlock: 'latest'
+    }).watch(function(error, event) {
+      console.log("event triggered", event)
+      // Reload when a new vote is recorded
+      App.render();
+    });
+  });
+  }*/
 
-  addTimer : function(){
-            var day = $("#input-day").val();
-            var hour = $("#input-hour").val();
-            var min = $("#input-min").val();
-            console.log(day+"----"+hour+"----"+min);
-
-            var now = new Date();
-            // var curMonth = now.getMonth();
-            // console.log(curMonth);
-             var curDate = now.getDate();
-             var curHour = now.getHours();
-             var curMin = now.getMinutes();
-             
-            var dy,hr,mn;
-            hr= parseInt(curHour)+parseInt(hour); 
-            dy = parseInt(curDate)+parseInt(day);
-            mn = parseInt(min)+parseInt(curMin);
-
-            if(mn>=60){
-              hr+=parseInt(mn/60);
-               if(hr>12){
-                dy+=parseInt(hr/24);
-                hr%=24;
-             }
-              mn%=60;
-            }
-
-            if(hr>12){
-              dy+=parseInt(hr/24);
-              hr%=24;
-             }
-            console.log(dy+",,"+hr+",,"+mn);
-            alert(`Voting process will continue for ${day} days ${hour} hours ${min} minutes`);
-
-            var electionInstance;
-
-            App.contracts.Election.deployed().then(i =>{
-              electionInstance = i;
-              return electionInstance.changeTimer(now.getMonth() , dy , hr , mn , parseInt(now.getSeconds()) , { from : App.account });
-            }).then(result=>{
-              $('#content').show();
-            }).catch(err=>{
-              console.log("ErroR "+err);
-            });
-    }
-  };
+};
 
 
 $(function() {
@@ -327,49 +338,3 @@ $(function() {
     App.init();
   });
 });
-
-
-
-    // App.contracts.Election.deployed().then(i=>{
-    //   electionInstance = i;
-    //   return electionInstance.timingNumber();
-    // }).then(count=>{
-
-    //   console.log("--++-"+count);
-    //   electionInstance.TimingList(1).then(dates => {
-    //   var month = dates[0];
-    //   var day = dates[1];
-    //   var hour = dates[2];
-    //   var min = dates[3];
-    //   console.log(month+"__"+day+"__"+hour+"__"+min);
-
-    //   var countdate=new Date("April 18,2021 "+hour+":"+min+":00");
-    //   console.log(countdate);
-
-    //   var time = setInterval(function(){
-    //   var now=new Date().getTime();
-    //            // console.log("----"+now);
-    //            gap=countdate-now;
-    //            var second=1000;
-    //            var minute=second*60;
-    //            var hour=minute*60;
-    //            var day=hour*24;
-
-    //            var d=Math.floor(gap/(day));
-    //            var h=Math.floor((gap%(day))/(hour));
-    //            var m=Math.floor((gap%(hour))/(minute));
-    //            var s=Math.floor((gap%(minute))/(second));
-
-    //            document.getElementById('day').innerText=d;
-    //            document.getElementById('hour').innerText=h;
-    //            document.getElementById('minute').innerText=m;
-    //            document.getElementById('second').innerText=s;
-
-    //            if(gap<=0){
-    //             clearInterval(time);
-    //             document.getElementById("countDown").innerHTML = "Time's Up !"
-    //             // alert("Time's Up!");
-    //            }
-    //          },1000)
-    //   })
-    // })
