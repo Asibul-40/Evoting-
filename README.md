@@ -12,6 +12,7 @@ This is a "public" Blockchain based E-voting system where the Admin can set the 
      * Import Account on MetaMask:
      * Select Type as Private Key and paste the private key copied previously
      * You should now see the first account on Ganache with it's balance of 100 ETH, on MetaMask.
+      
      * To set an admin:
      * Choose an account address from ganache and copy it in "/src/js/app.js" in line no 79.
      
