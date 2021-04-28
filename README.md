@@ -21,8 +21,8 @@ This is a "public" Blockchain based E-voting system where the Admin can set the 
 * git clone https://github.com/Asibul-40/Evoting-.git
 * npm install -g truffle
 * npm install
-* truffle migrate --reset
-* npm run dev
+* truffle migrate --reset (every time if you change some codes in smart contract).
+* npm run dev (to run the server).
 
 ## Note
 * Election result will be automatically shown after the timer ends but it will cost some ether.
