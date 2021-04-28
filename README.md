@@ -14,8 +14,7 @@ This is a "public" Blockchain based E-voting system where the Admin can set the 
      * You should now see the first account on Ganache with it's balance of 100 ETH, on MetaMask.
      * To set an admin:
      * Choose an account address from ganache and copy it in "/src/js/app.js" in line no 79.
-     * Election result will be automatically shown after the timer ends but it will cost some ether.
-
+     
 ## Deployment
 * Fork this repository
 * Change the current working directory to the location where you want the cloned directory.
@@ -24,6 +23,10 @@ This is a "public" Blockchain based E-voting system where the Admin can set the 
 * npm install
 * truffle migrate --reset
 * npm run dev
+
+## Note
+* Election result will be automatically shown after the timer ends but it will cost some ether.
+
 
 
 
