@@ -65,18 +65,18 @@ App = {
 
     loader.show();
     content.hide();
-
     // Load account data
     web3.eth.getCoinbase(function(err, account) {
       if (err === null) {
         App.account = account;
-
       // console.log("==>"+account);
         $("#accountAddress").html("Your Account: <b>" + account +"</b>");
       }
     });
     var totalCandidate;
-    var adminAccount = "0x1fe5e175a0181ce0177b79c19acb59eeeaad5b41";    
+    
+    //Set the Admin
+    var adminAccount = "Insert Admin account address";    
     var flag = 0;
 
     // Load contract data
