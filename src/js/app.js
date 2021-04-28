@@ -370,28 +370,6 @@ App = {
           }
     },
 
-    // result : function(){
-    //     var resultButton = $("#resultButton");
-
-    //         resultButton.click(function(){
-    //     // console.log("abir");
-    //           App.contracts.Election.deployed().then(i=>{
-    //             electionInstance = i;
-    //             return electionInstance.defineWinner( {from:App.account} );
-    //             }).then(res=>{
-    //                 // console.log(res);
-    //                 $("#content").hide();
-    //                 $('#loader').show();
-    //                 return electionInstance.winnerName();
-    //               }).then(winner=>{
-    //                 $('#candidate-content').hide();
-    //                 document.getElementById('countDown').innerHTML = `The winner of the election is ${winner}`;
-    //                 console.log("ashce ekhane ");
-    //               }).catch(err=>{
-    //                 console.log("ERROR is ",err);
-    //               })
-    //             })
-    // }
     
   };
 
