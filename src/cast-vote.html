@@ -151,8 +151,8 @@
                  <input id="input-candidateParty-field" type="text" name="party-name" placeholder="Candidate's Party name" style="border: 1px solid black"><br>
 
                   <button id="addCandidate" type="submit" class="btn btn-primary">Add Candidate</button>
-                  <button id="setTimerButton" type="button" class="btn btn-primary" >Set timer</button>
-                  <p>NB : Once you don't have any candidate to add, then set the <i><b>Countdown Timer</b></i> to start the election.</p>
+                  <button id="setTimerButton" type="button" class="btn btn-primary" >Set timer</button><br><br>
+                  <p><b>Note</b> : Once you don't have any candidate to add, then set the <i><b>Countdown Timer</b></i> to start the election.</p>
                   </div>
                 </form>
 
@@ -160,18 +160,22 @@
                   <!-- <form class="clock" onsubmit="App.castVote(); return false;"> -->
                  <form action="" onsubmit="App.addTimer(); return false;">
                    <div id="timer-form">
-                    <p>Set a duration time for the election:</p>
+                    <p style="font-size: 1.3em; ">Set a duration time for the election:</p>
                      <input type="text" id="input-day" size="4" placeholder="Day" style="border: 1px solid black;">
 
                      <input type="text" id="input-hour" size="4" placeholder="Hour" style="border: 1px solid black;">
 
                      <input type="text" id="input-min" size="4" placeholder="Minute" style="border: 1px solid black;"><br>
-                     <button class="btn btn-primary"> <a href="cast-vote.html">Add more</a> </button>
-                     <button id="startButton" type="submit" class="btn btn-primary">Start Election</button>
+                     <button class="btn btn-primary"> <a href="cast-vote.html">Add more Candidate</a> </button>
+                     <button id="startButton" type="submit" class="btn btn-primary">Start Election</button><br>
+
                    </div>
                  </form>   
 
                </div>
+                 
+                   <!-- <button id="resultButton" type="button" class="btn btn-primary" onclick="App.result(); return false;">Show Results</button> -->
+
 
             <table class="table" id="tableInfo">
               <thead>
@@ -183,7 +187,7 @@
                 
               </thead>
               <tbody id="candidatesResults">    </tbody>
-            </table>
+            </table><br>
 
             <form id="vote-form" onsubmit="App.castVote(); return false;">
                <div class="form-group" style="margin-top: 7em;">
@@ -196,8 +200,12 @@
                     </div>
                </div>
             </form>
+                   <center>
+                   <button style="margin-top: 1em;" id="start-new-election-btn" type="button" class="btn btn-primary" style="text-align: center;"> Start A New Election  </button><br>
+                    </center>
 
-            <p id="accountAddress" class="text-center" style="margin-top: 9em"></p>
+            <p id="accountAddress" class="text-center" style="margin-top: 7em"></p>
+            
           </div>
         </div>
       </div>
