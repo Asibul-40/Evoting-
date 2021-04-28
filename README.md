@@ -10,9 +10,11 @@ This is a "public" Blockchain based E-voting system where the Admin can set the 
      * Create a new Custom RPC with the Ganache RPC Server URL: http://localhost:7545/ and connect
      * Copy the private key for the first account on Ganache by clicking the key icon
      * Import Account on MetaMask:
-            * Select Type as Private Key and paste the private key copied previously
+     * Select Type as Private Key and paste the private key copied previously
      * You should now see the first account on Ganache with it's balance of 100 ETH, on MetaMask.
-
+     * To set an admin:
+     * Choose an account address from ganache and copy it in "/src/js/app.js" in line no 79.
+     * Election result will be automatically shown after the timer ends but it will cost some ether.
 
 ## Deployment
 * Fork this repository
@@ -22,3 +24,7 @@ This is a "public" Blockchain based E-voting system where the Admin can set the 
 * npm install
 * truffle migrate --reset
 * npm run dev
+
+
+
+
