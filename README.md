@@ -16,8 +16,8 @@ This is a "public" Blockchain based E-voting system where the Admin can set the 
 
 ## Deployment
 * Fork this repository
-* git clone https://github.com/your-username/Evoting-
-* cd Evoting
+* Change the current working directory to the location where you want the cloned directory.
+* git clone https://github.com/Asibul-40/Evoting-.git
 * npm install -g truffle
 * npm install
 * truffle migrate --reset
